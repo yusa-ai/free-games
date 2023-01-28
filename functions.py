@@ -66,15 +66,3 @@ async def send_free_games(ctx, debug=False):
         await ctx.respond(embeds=embeds)
     else:
         await ctx.respond("No new free game available!")
-
-
-def remove_expired_deals(free_games):
-    database.cursor.execute("SELECT DISTINCT id FROM deals")
-    history_deal_ids = [deal[0] for deal in database.cursor.fetchall()]
-
-    free_game_ids = [game["dealID"] for game in free_games]
-
-    for deal_id in history_deal_ids:
-        if deal_id not in free_game_ids:
-            database.cursor.execute("DELETE FROM deals WHERE id = ?", (deal_id,))
-    database.connection.commit()
