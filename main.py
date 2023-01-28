@@ -27,10 +27,19 @@ async def broadcast_free_games(free_games, debug=False):
     channel_ids = [ch[0] for ch in database.cursor.fetchall()]
 
     for channel_id in channel_ids:
+        # Get stores that the channel listens to
+        database.cursor.execute("SELECT store_id FROM channel_stores WHERE channel_id = ?", (channel_id,))
+        selected_store_ids = database.cursor.fetchall()
+        selected_store_ids = [tpl[0] for tpl in selected_store_ids]
+
+        # Get previous deals
         database.cursor.execute("SELECT id FROM deals WHERE channel_id = ?", (channel_id,))
         previous_deal_ids = [deal[0] for deal in database.cursor.fetchall()]
 
         for game in free_games:
+            if game["storeID"] not in selected_store_ids:
+                continue
+
             deal_id = game["dealID"]
 
             # Check if deal was not already sent
@@ -58,7 +67,6 @@ async def remove_expired_deals(free_games):
 
 
 @bot.slash_command(description="Query free game deals manually")
-@commands.cooldown(1, 900, commands.BucketType.guild)
 async def free():
     await broadcast_free_games(functions.get_free_games())
 
