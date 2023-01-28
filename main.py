@@ -4,6 +4,7 @@ from datetime import datetime
 
 import discord
 import requests
+from discord.ext import commands
 from discord.ext import tasks
 
 DISCORD_BOT_TOKEN = os.getenv("DISCORD_BOT_TOKEN")
@@ -138,7 +139,8 @@ async def on_ready():
     broadcast_free_games.start()
 
 
-@bot.slash_command(description="Fetch free game deals")
+@bot.slash_command(description="Query free game deals manually")
+@commands.cooldown(1, 900, commands.BucketType.guild)
 async def free(ctx):
     await send_free_games(ctx)
 
@@ -150,7 +152,7 @@ async def subscribe(ctx):
         conn.commit()
         await ctx.respond("✅ This channel is now subscribed to receive free game deals.")
     except sqlite3.IntegrityError:
-        await ctx.respond("❌ This channel is already subscribed to receive free game deals.")
+        await ctx.respond("✅ This channel is already subscribed to receive free game deals.")
 
 
 @bot.slash_command(description="Unsubscribe the current channel from receiving free game deals")
@@ -159,6 +161,12 @@ async def unsubscribe(ctx):
     cursor.execute("DELETE FROM channels WHERE id = ?", (ctx.channel_id,))
     conn.commit()
     await ctx.respond("✅ This channel is now unsubscribed from receiving free game deals.")
+
+
+@bot.event
+async def on_application_command_error(ctx: discord.ApplicationContext, error: discord.DiscordException):
+    if isinstance(error, commands.CommandOnCooldown):
+        await ctx.respond(f"❌ This command is currently on cooldown. Please try again in {round(error.retry_after)}s.")
 
 
 bot.run(DISCORD_BOT_TOKEN)
