@@ -98,7 +98,7 @@ async def unsubscribe(ctx):
     await ctx.respond("✅ This channel is now unsubscribed from receiving free games.")
 
 
-@bot.slash_command(description="Choose which stores to get free games from", guild_ids=[1067218515343450264])
+@bot.slash_command(description="Choose which stores to get free games from")
 async def stores(ctx):
     view = discord.ui.View(SelectStores(ctx))
     await ctx.respond("Select which stores to look for free games from", view=view)
