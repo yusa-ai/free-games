@@ -36,3 +36,15 @@ class SelectStores(discord.ui.Select):
         database.connection.commit()
 
         await interaction.response.send_message("Your changes have been saved.")
+
+
+class DealButton(discord.ui.Button):
+    def __init__(self, game):
+        super().__init__(
+            label="Get the game!",
+            style=discord.ButtonStyle.link,
+            url=functions.get_deal_url(game)
+        )
+
+    async def callback(self, interaction: discord.InteractionResponse):
+        await interaction.response.send_message("Your changes have been saved.")

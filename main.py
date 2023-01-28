@@ -7,7 +7,7 @@ from discord.ext import tasks
 
 import database
 import functions
-from select_stores import SelectStores
+from views import DealButton, SelectStores
 
 DISCORD_BOT_TOKEN = os.getenv("DISCORD_BOT_TOKEN")
 
@@ -45,7 +45,8 @@ async def broadcast_free_games(free_games, debug=False):
             # Check if deal was not already sent
             if deal_id not in previous_deal_ids or debug is True:
                 embed = functions.get_embed(game)
-                await bot.get_channel(channel_id).send(embed=embed)
+                view = discord.ui.View(DealButton(game))
+                await bot.get_channel(channel_id).send(embed=embed, view=view)
 
                 if debug is False:
                     database.cursor.execute("INSERT INTO deals VALUES (?, ?)", (deal_id, channel_id))

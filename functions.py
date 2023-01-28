@@ -9,6 +9,8 @@ CHEAPSHARK_API_DEAL_ENDPOINT = "https://www.cheapshark.com/api/1.0/deals"
 CHEAPSHARK_API_STORE_ENDPOINT = "https://www.cheapshark.com/api/1.0/stores"
 CHEAPSHARK_DEAL_URL = "https://www.cheapshark.com/redirect?dealID="
 
+METACRITIC_URL = "https://www.metacritic.com"
+
 
 def get_current_date_time():
     return "[" + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "]"
@@ -27,6 +29,10 @@ def get_free_games() -> dict:
     return response.json()
 
 
+def get_deal_url(game):
+    return f"{CHEAPSHARK_DEAL_URL}{game['dealID']}"
+
+
 def get_store_name(store_id: str) -> str:
     database.cursor.execute("SELECT name FROM stores WHERE id = ?", (store_id,))
     store_name = database.cursor.fetchone()[0]
@@ -37,10 +43,22 @@ def get_store_name(store_id: str) -> str:
 def get_embed(game):
     embed = discord.Embed(
         title=game["title"],
-        url=f"{CHEAPSHARK_DEAL_URL}{game['dealID']}",
-        description=f"Free for a limited time on {get_store_name(game['storeID'])}!", color=0xc15c5c
+        url=get_deal_url(game),
+        description=f"Free for a limited time on {get_store_name(game['storeID'])}!",
+        color=0xc15c5c
     )
-    embed.set_thumbnail(url=game["thumb"])
+
+    embed.add_field(name="Sale price", value=f"${game['salePrice']}", inline=True)
+    embed.add_field(name="Normal price", value=f"${game['normalPrice']}", inline=True)
+
+    embed.add_field(name="\u200b", value="\u200b")
+
+    embed.add_field(name="Metacritic score", value=game["metacriticScore"], inline=True)
+    embed.add_field(name="Metacritic URL", value=f"[Metacritic]({METACRITIC_URL}{game['metacriticLink']})",
+                    inline=True)
+
+    embed.set_image(url=game["thumb"])
+
     return embed
 
 
