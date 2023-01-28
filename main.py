@@ -13,8 +13,10 @@ DISCORD_BOT_TOKEN = os.getenv("DISCORD_BOT_TOKEN")
 
 bot = discord.Bot()
 
+WAIT_INTERVAL = 60
 
-@tasks.loop(minutes=15)
+
+@tasks.loop(minutes=WAIT_INTERVAL)
 async def main_loop():
     free_games = functions.get_free_games()
 
