@@ -45,6 +45,3 @@ class DealButton(discord.ui.Button):
             style=discord.ButtonStyle.link,
             url=functions.get_deal_url(game)
         )
-
-    async def callback(self, interaction: discord.InteractionResponse):
-        await interaction.response.send_message("Your changes have been saved.")
