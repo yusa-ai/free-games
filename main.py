@@ -56,17 +56,17 @@ async def subscribe(ctx):
     try:
         cursor.execute("INSERT INTO channels VALUES (?)", (ctx.channel_id,))
         conn.commit()
-        await ctx.respond("✅ This channel is now subscribed to receive free game deals.")
+        await ctx.respond("✅ This channel is now subscribed to receive free games.")
     except sqlite3.IntegrityError:
-        await ctx.respond("✅ This channel is already subscribed to receive free game deals.")
+        await ctx.respond("✅ This channel is already subscribed to receive free games.")
 
 
-@bot.slash_command(description="Unsubscribe the current channel from receiving free game deals")
+@bot.slash_command(description="Unsubscribe the current channel from receiving free games")
 async def unsubscribe(ctx):
     cursor.execute("DELETE FROM deals WHERE channel_id = ?", (ctx.channel_id,))
     cursor.execute("DELETE FROM channels WHERE id = ?", (ctx.channel_id,))
     conn.commit()
-    await ctx.respond("✅ This channel is now unsubscribed from receiving free game deals.")
+    await ctx.respond("✅ This channel is now unsubscribed from receiving free games.")
 
 
 @bot.event
