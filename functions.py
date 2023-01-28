@@ -1,9 +1,8 @@
-import sqlite3
 from datetime import datetime
 
 import discord
 import requests
-
+import sqlite3
 
 DB_FILE = "games.db"
 DB_SCRIPT_FILE = "script.sql"
