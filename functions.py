@@ -66,3 +66,16 @@ async def send_free_games(ctx, debug=False):
         await ctx.respond(embeds=embeds)
     else:
         await ctx.respond("No new free game available!")
+
+
+def get_stores():
+    database.cursor.execute("SELECT * FROM stores ORDER BY name")
+    stores = database.cursor.fetchall()
+    return stores
+
+
+def get_selected_store_ids(channel_id):
+    database.cursor.execute("SELECT store_id FROM channel_stores WHERE channel_id = ?", (channel_id,))
+    selected_store_ids = database.cursor.fetchall()
+    selected_store_ids = [tpl[0] for tpl in selected_store_ids]
+    return selected_store_ids

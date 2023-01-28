@@ -1,6 +1,7 @@
 import discord
 
 import database
+import functions
 
 
 class SelectStores(discord.ui.Select):
@@ -8,13 +9,10 @@ class SelectStores(discord.ui.Select):
         self.ctx = ctx
 
         # Get stores from DB
-        database.cursor.execute("SELECT * FROM stores ORDER BY name")
-        stores = database.cursor.fetchall()
+        stores = functions.get_stores()
 
         # Get selected stores from DB
-        database.cursor.execute("SELECT store_id FROM channel_stores WHERE channel_id = ?", (ctx.channel_id,))
-        selected_store_ids = database.cursor.fetchall()
-        selected_store_ids = [tpl[0] for tpl in selected_store_ids]
+        selected_store_ids = functions.get_selected_store_ids(ctx.channel_id)
 
         options = [
             discord.SelectOption(

@@ -1,17 +1,20 @@
-CREATE TABLE IF NOT EXISTS channels (
+CREATE TABLE IF NOT EXISTS channels
+(
     id INT PRIMARY KEY
 );
 
-CREATE TABLE IF NOT EXISTS deals (
-                                     id         TEXT,
-                                     channel_id INT REFERENCES channels (id),
-                                     PRIMARY KEY (id, channel_id)
+CREATE TABLE IF NOT EXISTS deals
+(
+    id         TEXT,
+    channel_id INT REFERENCES channels (id),
+    PRIMARY KEY (id, channel_id)
 );
 
 CREATE TABLE IF NOT EXISTS stores
 (
-    id   TEXT PRIMARY KEY,
-    name TEXT UNIQUE NOT NULL
+    id         TEXT PRIMARY KEY,
+    name       TEXT UNIQUE NOT NULL,
+    by_default INTEGER DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS channel_stores
@@ -22,14 +25,14 @@ CREATE TABLE IF NOT EXISTS channel_stores
 );
 
 INSERT OR IGNORE INTO stores
-VALUES ("1", "Steam");
+VALUES ("1", "Steam", TRUE);
 INSERT OR IGNORE INTO stores
-VALUES ("7", "GOG");
+VALUES ("7", "GOG", TRUE);
 INSERT OR IGNORE INTO stores
-VALUES ("8", "Origin");
+VALUES ("8", "Origin", TRUE);
 INSERT OR IGNORE INTO stores
-VALUES ("13", "Ubisoft Connect");
+VALUES ("13", "Ubisoft Connect", TRUE);
 INSERT OR IGNORE INTO stores
-VALUES ("15", "Fanatical");
+VALUES ("15", "Fanatical", TRUE);
 INSERT OR IGNORE INTO stores
-VALUES ("25", "Epic Games Store");
+VALUES ("25", "Epic Games Store", TRUE);

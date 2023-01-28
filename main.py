@@ -68,7 +68,7 @@ async def remove_expired_deals(free_games):
 
 @commands.is_owner()
 @bot.slash_command(description="Query free game deals manually")
-async def free():
+async def free(ctx):
     await broadcast_free_games(functions.get_free_games())
 
 
@@ -76,8 +76,14 @@ async def free():
 async def subscribe(ctx):
     try:
         database.cursor.execute("INSERT INTO channels VALUES (?)", (ctx.channel_id,))
+        # Add default stores to channel
+        default_stores = functions.get_stores()
+        for store in default_stores:
+            database.cursor.execute("INSERT INTO channel_stores VALUES (?, ?)", (ctx.channel_id, store[0]))
         database.connection.commit()
+
         await ctx.respond("✅ This channel is now subscribed to receive free games.")
+
     except sqlite3.IntegrityError:
         await ctx.respond("✅ This channel is already subscribed to receive free games.")
 
@@ -86,7 +92,9 @@ async def subscribe(ctx):
 async def unsubscribe(ctx):
     database.cursor.execute("DELETE FROM deals WHERE channel_id = ?", (ctx.channel_id,))
     database.cursor.execute("DELETE FROM channels WHERE id = ?", (ctx.channel_id,))
+    database.cursor.execute("DELETE FROM channel_stores WHERE channel_id = ?", (ctx.channel_id,))
     database.connection.commit()
+
     await ctx.respond("✅ This channel is now unsubscribed from receiving free games.")
 
 
