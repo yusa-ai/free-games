@@ -2,12 +2,12 @@ import os
 import sqlite3
 
 import discord
-
 from discord.ext import commands
 from discord.ext import tasks
 
 import database
 import functions
+from select_stores import SelectStores
 
 DISCORD_BOT_TOKEN = os.getenv("DISCORD_BOT_TOKEN")
 
@@ -71,6 +71,12 @@ async def unsubscribe(ctx):
     database.cursor.execute("DELETE FROM channels WHERE id = ?", (ctx.channel_id,))
     database.connection.commit()
     await ctx.respond("✅ This channel is now unsubscribed from receiving free games.")
+
+
+@bot.slash_command(description="Choose which stores to get free games from", guild_ids=[1067218515343450264])
+async def stores(ctx):
+    view = discord.ui.View(SelectStores(ctx))
+    await ctx.respond("Select which stores to look for free games from", view=view)
 
 
 @bot.event
