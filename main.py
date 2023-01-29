@@ -114,10 +114,10 @@ async def role(ctx: discord.ApplicationContext):
     await ctx.respond("Select which role to mention when there is a free game to claim", view=view, ephemeral=True)
 
 
-@bot.slash_command(description="Rename the bot", guild_ids=[1067218515343450264])
-async def rename(ctx: discord.ApplicationContext, nickname):
-    await ctx.me.edit(nick=nickname)
-    await ctx.respond("Bot renamed.", ephemeral=True)
+@bot.slash_command(description="Change the bot's nickname in this server", guild_ids=[1067218515343450264])
+async def nickname(ctx: discord.ApplicationContext, nick):
+    await ctx.me.edit(nick=nick)
+    await ctx.respond("Server nickname changed.", ephemeral=True)
 
 
 @bot.event
