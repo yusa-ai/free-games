@@ -23,7 +23,7 @@ class SelectStores(discord.ui.Select):
         ]
 
         super().__init__(
-            placeholder="Select Stores",
+            placeholder="Select stores",
             options=options,
             min_values=1,
             max_values=len(options)
@@ -45,3 +45,31 @@ class DealButton(discord.ui.Button):
             style=discord.ButtonStyle.link,
             url=functions.get_deal_url(game)
         )
+
+
+class SelectRole(discord.ui.Select):
+    def __init__(self, ctx: discord.ApplicationContext):
+        self.ctx = ctx
+        self.roles = ctx.guild.roles
+
+        self.roles = [role for role in self.roles if role.name != "@everyone"]
+
+        options = [
+            discord.SelectOption(
+                value=str(role.id),
+                label=role.name,
+            ) for role in self.roles
+        ]
+
+        super().__init__(
+            placeholder="Select role",
+            options=options,
+            min_values=1,
+            max_values=1
+        )
+
+    async def callback(self, interaction: discord.InteractionResponse):
+        database.cursor.execute("UPDATE channels SET role_id = ? WHERE id = ?", (self.values[0], self.ctx.channel_id))
+        database.connection.commit()
+
+        await interaction.response.send_message("Your changes have been saved.", ephemeral=True)

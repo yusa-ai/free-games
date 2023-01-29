@@ -1,6 +1,8 @@
 CREATE TABLE IF NOT EXISTS channels
 (
-    id INT PRIMARY KEY
+    id       INT PRIMARY KEY,
+    guild_id INT UNIQUE,
+    role_id  INT UNIQUE DEFAULT NULL
 );
 
 CREATE TABLE IF NOT EXISTS deals

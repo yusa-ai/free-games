@@ -7,7 +7,7 @@ from discord.ext import tasks
 
 import database
 import functions
-from views import DealButton, SelectStores
+from components import SelectStores, DealButton, SelectRole
 
 DISCORD_BOT_TOKEN = os.getenv("DISCORD_BOT_TOKEN")
 
@@ -46,9 +46,14 @@ async def broadcast_free_games(free_games, debug=False):
 
             # Check if deal was not already sent
             if deal_id not in previous_deal_ids or debug is True:
+                database.cursor.execute("SELECT role_id FROM channels WHERE id = ?", (channel_id,))
+                role_id = database.cursor.fetchone()[0]
+
+                content = f"<@&{role_id}>" if role_id else None
                 embed = functions.get_embed(game)
                 view = discord.ui.View(DealButton(game))
-                await bot.get_channel(channel_id).send(embed=embed, view=view)
+
+                await bot.get_channel(channel_id).send(content=content, embed=embed, view=view)
 
                 if debug is False:
                     database.cursor.execute("INSERT INTO deals VALUES (?, ?)", (deal_id, channel_id))
@@ -76,9 +81,10 @@ async def free(ctx):
 
 
 @bot.slash_command(description="Subscribe the bot to the current channel to get free game deals")
-async def subscribe(ctx):
+async def subscribe(ctx: discord.ApplicationContext):
     try:
-        database.cursor.execute("INSERT INTO channels VALUES (?)", (ctx.channel_id,))
+        database.cursor.execute("INSERT INTO channels (id, guild_id) VALUES (?, ?)", (ctx.channel_id, ctx.guild_id))
+
         # Add default stores to channel
         default_stores = functions.get_stores()
         for store in default_stores:
@@ -101,10 +107,17 @@ async def unsubscribe(ctx):
     await ctx.respond("✅ This channel is now unsubscribed from receiving free games.")
 
 
-@bot.slash_command(description="Choose which stores to get free games from")
+@bot.slash_command(description="Select which stores to get free games from")
 async def stores(ctx):
     view = discord.ui.View(SelectStores(ctx))
-    await ctx.respond("Select which stores to look for free games from", view=view)
+    await ctx.respond("Select which stores to get free games from", view=view)
+
+
+@bot.slash_command(description="Select which role to ping when there is a free game to claim",
+                   guild_ids=[1067218515343450264])
+async def role(ctx: discord.ApplicationContext):
+    view = discord.ui.View(SelectRole(ctx))
+    await ctx.respond("Select which role to ping when there is a free game to claim", view=view, ephemeral=True)
 
 
 @bot.event
