@@ -62,30 +62,6 @@ def get_embed(game):
     return embed
 
 
-async def send_free_games(ctx, debug=False):
-    free_games = get_free_games()
-
-    database.cursor.execute("SELECT id FROM deals WHERE channel_id = ?", (ctx.channel_id,))
-    previous_deal_ids = [deal[0] for deal in database.cursor.fetchall()]
-
-    embeds = []
-
-    for game in free_games:
-        deal_id = game["dealID"]
-
-        if deal_id not in previous_deal_ids or debug is True:
-            embeds.append(get_embed(game))
-
-            if debug is False:
-                database.cursor.execute("INSERT INTO deals VALUES (?, ?)", (deal_id, ctx.channel_id))
-                database.connection.commit()
-
-    if embeds:
-        await ctx.respond(embeds=embeds)
-    else:
-        await ctx.respond("No new free game available!")
-
-
 def get_stores():
     database.cursor.execute("SELECT * FROM stores ORDER BY name")
     stores = database.cursor.fetchall()
