@@ -23,7 +23,7 @@ class SelectStores(discord.ui.Select):
         ]
 
         super().__init__(
-            placeholder="Stores",
+            placeholder="Select Stores",
             options=options,
             min_values=1,
             max_values=len(options)
