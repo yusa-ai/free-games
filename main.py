@@ -74,6 +74,7 @@ async def remove_expired_deals(free_games):
     database.connection.commit()
 
 
+@commands.has_permissions(administrator=True)
 @bot.slash_command(description="Register the current channel to get free game deals")
 async def register(ctx: discord.ApplicationContext):
     try:
@@ -91,6 +92,7 @@ async def register(ctx: discord.ApplicationContext):
         await ctx.respond("✅ This channel is already subscribed to receive free games.")
 
 
+@commands.has_permissions(administrator=True)
 @bot.slash_command(description="Unregister the current channel from receiving free games")
 async def unregister(ctx):
     database.cursor.execute("DELETE FROM deals WHERE channel_id = ?", (ctx.channel_id,))
@@ -101,6 +103,7 @@ async def unregister(ctx):
     await ctx.respond("✅ This channel is now unsubscribed from receiving free games.")
 
 
+@commands.has_permissions(administrator=True)
 @bot.slash_command(description="Select which stores to get free games from")
 async def stores(ctx):
     view = discord.ui.View(SelectStores(ctx))
@@ -114,6 +117,7 @@ async def role(ctx: discord.ApplicationContext):
     await ctx.respond("Select which role to mention when there is a free game to claim", view=view, ephemeral=True)
 
 
+@commands.has_permissions(administrator=True)
 @bot.slash_command(description="Change the bot's nickname in this server", guild_ids=[1067218515343450264])
 async def nickname(ctx: discord.ApplicationContext, nick):
     await ctx.me.edit(nick=nick)
