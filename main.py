@@ -74,12 +74,6 @@ async def remove_expired_deals(free_games):
     database.connection.commit()
 
 
-@commands.is_owner()
-@bot.slash_command(description="Query free game deals manually")
-async def free(ctx):
-    await broadcast_free_games(functions.get_free_games())
-
-
 @bot.slash_command(description="Subscribe the bot to the current channel to get free game deals")
 async def subscribe(ctx: discord.ApplicationContext):
     try:
