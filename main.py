@@ -115,8 +115,8 @@ async def role(ctx: discord.ApplicationContext):
 
 
 @bot.slash_command(description="Rename the bot", guild_ids=[1067218515343450264])
-async def rename(ctx, name):
-    await bot.user.edit(username=name)
+async def rename(ctx: discord.ApplicationContext, nickname):
+    await ctx.me.edit(nick=nickname)
     await ctx.respond("Bot renamed.", ephemeral=True)
 
 
