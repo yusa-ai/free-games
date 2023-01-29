@@ -35,7 +35,7 @@ class SelectStores(discord.ui.Select):
             database.cursor.execute("INSERT INTO channel_stores VALUES (?, ?)", (self.ctx.channel_id, value))
         database.connection.commit()
 
-        await interaction.response.send_message("Your changes have been saved.")
+        await interaction.response.send_message("Your changes have been saved.", ephemeral=True)
 
 
 class DealButton(discord.ui.Button):

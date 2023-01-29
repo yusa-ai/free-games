@@ -104,7 +104,7 @@ async def unregister(ctx):
 @bot.slash_command(description="Select which stores to get free games from")
 async def stores(ctx):
     view = discord.ui.View(SelectStores(ctx))
-    await ctx.respond("Select which stores to get free games from", view=view)
+    await ctx.respond("Select which stores to get free games from", view=view, ephemeral=True)
 
 
 @bot.slash_command(description="Select which role to ping when there is a free game to claim",
@@ -124,7 +124,8 @@ async def on_ready():
 @bot.event
 async def on_application_command_error(ctx: discord.ApplicationContext, error: discord.DiscordException):
     if isinstance(error, commands.CommandOnCooldown):
-        await ctx.respond(f"❌ This command is currently on cooldown. Please try again in {round(error.retry_after)}s.")
+        await ctx.respond(f"❌ This command is currently on cooldown. Please try again in {round(error.retry_after)}s.",
+                          ephemeral=True)
 
 
 bot.run(DISCORD_BOT_TOKEN)
