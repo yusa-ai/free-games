@@ -111,7 +111,7 @@ async def stores(ctx):
                    guild_ids=[1067218515343450264])
 async def role(ctx: discord.ApplicationContext):
     view = discord.ui.View(SelectRole(ctx))
-    await ctx.respond("Select which role to ping when there is a free game to claim", view=view, ephemeral=True)
+    await ctx.respond("Select which role to mention when there is a free game to claim", view=view, ephemeral=True)
 
 
 @bot.event
