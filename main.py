@@ -74,8 +74,8 @@ async def remove_expired_deals(free_games):
     database.connection.commit()
 
 
-@bot.slash_command(description="Subscribe the bot to the current channel to get free game deals")
-async def subscribe(ctx: discord.ApplicationContext):
+@bot.slash_command(description="Register the current channel to get free game deals")
+async def register(ctx: discord.ApplicationContext):
     try:
         database.cursor.execute("INSERT INTO channels (id, guild_id) VALUES (?, ?)", (ctx.channel_id, ctx.guild_id))
 
@@ -91,8 +91,8 @@ async def subscribe(ctx: discord.ApplicationContext):
         await ctx.respond("✅ This channel is already subscribed to receive free games.")
 
 
-@bot.slash_command(description="Unsubscribe the current channel from receiving free games")
-async def unsubscribe(ctx):
+@bot.slash_command(description="Unregister the current channel from receiving free games")
+async def unregister(ctx):
     database.cursor.execute("DELETE FROM deals WHERE channel_id = ?", (ctx.channel_id,))
     database.cursor.execute("DELETE FROM channels WHERE id = ?", (ctx.channel_id,))
     database.cursor.execute("DELETE FROM channel_stores WHERE channel_id = ?", (ctx.channel_id,))
