@@ -16,8 +16,8 @@ class SelectStores(discord.ui.Select):
 
         options = [
             discord.SelectOption(
-                value=store[0],
                 label=store[1],
+                value=store[0],
                 default=store[0] in selected_store_ids
             ) for store in stores
         ]
@@ -53,13 +53,14 @@ class SelectRole(discord.ui.Select):
         self.roles = ctx.guild.roles
 
         self.roles = [role for role in self.roles if role.name != "@everyone"]
-
-        options = [
-            discord.SelectOption(
-                value=str(role.id),
-                label=role.name,
-            ) for role in self.roles
-        ]
+        options = [discord.SelectOption(label="None (don't ping any role)", value="none")]
+        for role in self.roles:
+            options.append(
+                discord.SelectOption(
+                    label=role.name,
+                    value=str(role.id)
+                )
+            )
 
         super().__init__(
             placeholder="Select role",
@@ -69,7 +70,19 @@ class SelectRole(discord.ui.Select):
         )
 
     async def callback(self, interaction: discord.InteractionResponse):
-        database.cursor.execute("UPDATE channels SET role_id = ? WHERE id = ?", (self.values[0], self.ctx.channel_id))
+        role_id = self.values[0] if self.values[0] != "none" else None
+
+        # Insert row if it doesn't exist (register the channel)
+        database.cursor.execute("INSERT OR IGNORE INTO channels VALUES (?, ?, ?)", (self.ctx.channel_id,
+                                                                                    self.ctx.guild_id, role_id))
+
+        database.cursor.execute("UPDATE channels SET role_id = ? WHERE id = ?", (role_id, self.ctx.channel_id))
         database.connection.commit()
 
-        await interaction.response.send_message("Your changes have been saved.", ephemeral=True)
+        if role_id:
+            await interaction.response.send_message(f"{self.ctx.bot.user.name} will now mention your selected role "
+                                                    f"when sending free games.",
+                                                    ephemeral=True)
+        else:
+            await interaction.response.send_message(f"{self.ctx.bot.user.name} will not ping anyone when sending "
+                                                    f"free games.", ephemeral=True)
