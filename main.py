@@ -114,6 +114,12 @@ async def role(ctx: discord.ApplicationContext):
     await ctx.respond("Select which role to mention when there is a free game to claim", view=view, ephemeral=True)
 
 
+@bot.slash_command(description="Rename the bot", guild_ids=[1067218515343450264])
+async def rename(ctx, name):
+    await bot.user.edit(username=name)
+    await ctx.respond("Bot renamed.", ephemeral=True)
+
+
 @bot.event
 async def on_ready():
     print(f"{functions.get_current_date_time()} Logged in as {bot.user}")
