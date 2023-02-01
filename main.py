@@ -13,10 +13,10 @@ DISCORD_BOT_TOKEN = os.getenv("DISCORD_BOT_TOKEN")
 
 bot = discord.Bot()
 
-WAIT_INTERVAL = 60
+WAIT_INTERVAL_HOURS = 12
 
 
-@tasks.loop(minutes=WAIT_INTERVAL)
+@tasks.loop(hours=WAIT_INTERVAL_HOURS)
 async def main_loop():
     free_games = functions.get_free_games()
 
@@ -122,6 +122,13 @@ async def role(ctx: discord.ApplicationContext):
 async def nickname(ctx: discord.ApplicationContext, nick):
     await ctx.me.edit(nick=nick)
     await ctx.respond("Server nickname changed.", ephemeral=True)
+
+
+# @commands.has_permissions(administrator=True)
+# @bot.slash_command(description="Send a message that users of this server can react to in order to get the configured "
+#                                "role that will be mentioned when there are free games to claim")
+# async def react_role(ctx: discord.ApplicationContext):
+#     pass
 
 
 @bot.event
