@@ -73,8 +73,8 @@ class SelectRole(discord.ui.Select):
         role_id = self.values[0] if self.values[0] != "none" else None
 
         # Insert row if it doesn't exist (register the channel)
-        database.cursor.execute("INSERT OR IGNORE INTO channels VALUES (?, ?, ?)", (self.ctx.channel_id,
-                                                                                    self.ctx.guild_id, role_id))
+        database.cursor.execute("INSERT OR IGNORE INTO channels (id, guild_id, role_id) VALUES (?, ?, ?)",
+                                (self.ctx.channel_id, self.ctx.guild_id, role_id))
 
         database.cursor.execute("UPDATE channels SET role_id = ? WHERE id = ?", (role_id, self.ctx.channel_id))
         database.connection.commit()

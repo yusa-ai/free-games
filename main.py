@@ -11,7 +11,9 @@ from components import SelectStores, DealButton, SelectRole
 
 DISCORD_BOT_TOKEN = os.getenv("DISCORD_BOT_TOKEN")
 
-bot = discord.Bot()
+intents = discord.Intents.default()
+intents.members = True
+bot = discord.Bot(intents=intents)
 
 WAIT_INTERVAL_HOURS = 12
 
@@ -119,17 +121,49 @@ async def role(ctx: discord.ApplicationContext) -> None:
 
 
 @commands.has_permissions(administrator=True)
-@bot.slash_command(description="Change the bot's nickname in this server", guild_ids=[1067218515343450264])
+@bot.slash_command(description="Change the bot's nickname in this server")
 async def nickname(ctx: discord.ApplicationContext, nick: str) -> None:
     await ctx.me.edit(nick=nick)
     await ctx.respond("Server nickname changed.", ephemeral=True)
 
 
-# @commands.has_permissions(administrator=True)
-# @bot.slash_command(description="Send a message that users of this server can react to in order to get the configured "
-#                                "role that will be mentioned when there are free games to claim")
-# async def react_role(ctx: discord.ApplicationContext) -> None:
-#     pass
+@commands.has_permissions(administrator=True)
+@bot.slash_command(description="Send a message that can grant users the mentioned role for game deals")
+async def role_assign(ctx: discord.ApplicationContext) -> None:
+    message: discord.Message = await ctx.send("React ✅ to this message to get mentioned when game deals are available!")
+    await message.add_reaction("✅")
+    await ctx.respond("Reaction message sent.", ephemeral=True)
+
+    # Add message ID to database
+    database.cursor.execute("UPDATE channels SET role_message_id = ? WHERE id = ?",
+                            (message.id, ctx.channel_id))
+    database.connection.commit()
+
+
+@bot.event
+async def on_raw_reaction_add(reaction: discord.RawReactionActionEvent) -> None:
+    if reaction.user_id == bot.user.id:
+        return
+
+    database.cursor.execute("SELECT role_id, role_message_id FROM channels WHERE id = ?", (reaction.channel_id,))
+    role_id, role_message_id = database.cursor.fetchone()
+
+    if reaction.message_id == role_message_id:
+        guild_role = bot.get_guild(reaction.guild_id).get_role(role_id)
+        await reaction.member.add_roles(guild_role)
+
+
+@bot.event
+async def on_raw_reaction_remove(reaction: discord.RawReactionActionEvent) -> None:
+    database.cursor.execute("SELECT role_id, role_message_id FROM channels WHERE id = ?", (reaction.channel_id,))
+    role_id, role_message_id = database.cursor.fetchone()
+
+    if reaction.message_id == role_message_id:
+        guild = bot.get_guild(reaction.guild_id)
+        member = guild.get_member(reaction.user_id)
+        guild_role = guild.get_role(role_id)
+
+        await member.remove_roles(guild_role)
 
 
 @bot.event
