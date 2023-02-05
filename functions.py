@@ -12,7 +12,7 @@ CHEAPSHARK_DEAL_URL = "https://www.cheapshark.com/redirect?dealID="
 METACRITIC_URL = "https://www.metacritic.com"
 
 
-def get_current_date_time():
+def get_current_date_time() -> str:
     return "[" + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + "]"
 
 
@@ -29,7 +29,7 @@ def get_free_games() -> dict:
     return response.json()
 
 
-def get_deal_url(game):
+def get_deal_url(game: dict) -> str:
     return f"{CHEAPSHARK_DEAL_URL}{game['dealID']}"
 
 
@@ -40,7 +40,7 @@ def get_store_name(store_id: str) -> str:
     return store_name
 
 
-def get_embed(game):
+def get_embed(game: dict) -> discord.Embed:
     embed = discord.Embed(
         title=game["title"],
         url=get_deal_url(game),
@@ -62,13 +62,13 @@ def get_embed(game):
     return embed
 
 
-def get_stores():
+def get_stores() -> list:
     database.cursor.execute("SELECT * FROM stores ORDER BY name")
     stores = database.cursor.fetchall()
     return stores
 
 
-def get_selected_store_ids(channel_id):
+def get_selected_store_ids(channel_id: int) -> list:
     database.cursor.execute("SELECT store_id FROM channel_stores WHERE channel_id = ?", (channel_id,))
     selected_store_ids = database.cursor.fetchall()
     selected_store_ids = [tpl[0] for tpl in selected_store_ids]

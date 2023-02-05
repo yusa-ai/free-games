@@ -17,14 +17,14 @@ WAIT_INTERVAL_HOURS = 12
 
 
 @tasks.loop(hours=WAIT_INTERVAL_HOURS)
-async def main_loop():
+async def main_loop() -> None:
     free_games = functions.get_free_games()
 
     await broadcast_free_games(free_games)
     await remove_expired_deals(free_games)
 
 
-async def broadcast_free_games(free_games, debug=False):
+async def broadcast_free_games(free_games, debug=False) -> None:
     database.cursor.execute("SELECT id FROM channels")
     channel_ids = [ch[0] for ch in database.cursor.fetchall()]
 
@@ -62,7 +62,7 @@ async def broadcast_free_games(free_games, debug=False):
     print(f"{functions.get_current_date_time()} Sent free games to subscribed channels")
 
 
-async def remove_expired_deals(free_games):
+async def remove_expired_deals(free_games) -> None:
     database.cursor.execute("SELECT DISTINCT id FROM deals")
     history_deal_ids = [deal[0] for deal in database.cursor.fetchall()]
 
@@ -76,7 +76,7 @@ async def remove_expired_deals(free_games):
 
 @commands.has_permissions(administrator=True)
 @bot.slash_command(description="Register the current channel to get free game deals")
-async def register(ctx: discord.ApplicationContext):
+async def register(ctx: discord.ApplicationContext) -> None:
     try:
         database.cursor.execute("INSERT INTO channels (id, guild_id) VALUES (?, ?)", (ctx.channel_id, ctx.guild_id))
 
@@ -94,7 +94,7 @@ async def register(ctx: discord.ApplicationContext):
 
 @commands.has_permissions(administrator=True)
 @bot.slash_command(description="Unregister the current channel from receiving free games")
-async def unregister(ctx):
+async def unregister(ctx: discord.ApplicationContext) -> None:
     database.cursor.execute("DELETE FROM deals WHERE channel_id = ?", (ctx.channel_id,))
     database.cursor.execute("DELETE FROM channels WHERE id = ?", (ctx.channel_id,))
     database.cursor.execute("DELETE FROM channel_stores WHERE channel_id = ?", (ctx.channel_id,))
@@ -105,21 +105,21 @@ async def unregister(ctx):
 
 @commands.has_permissions(administrator=True)
 @bot.slash_command(description="Select which stores to get free games from")
-async def stores(ctx):
+async def stores(ctx: discord.ApplicationContext) -> None:
     view = discord.ui.View(SelectStores(ctx))
     await ctx.respond("Select which stores to get free games from", view=view, ephemeral=True)
 
 
 @bot.slash_command(description="Select which role to ping when there is a free game to claim",
                    guild_ids=[1067218515343450264])
-async def role(ctx: discord.ApplicationContext):
+async def role(ctx: discord.ApplicationContext) -> None:
     view = discord.ui.View(SelectRole(ctx))
     await ctx.respond("Select which role to mention when there is a free game to claim", view=view, ephemeral=True)
 
 
 @commands.has_permissions(administrator=True)
 @bot.slash_command(description="Change the bot's nickname in this server", guild_ids=[1067218515343450264])
-async def nickname(ctx: discord.ApplicationContext, nick):
+async def nickname(ctx: discord.ApplicationContext, nick: str) -> None:
     await ctx.me.edit(nick=nick)
     await ctx.respond("Server nickname changed.", ephemeral=True)
 
@@ -127,19 +127,19 @@ async def nickname(ctx: discord.ApplicationContext, nick):
 # @commands.has_permissions(administrator=True)
 # @bot.slash_command(description="Send a message that users of this server can react to in order to get the configured "
 #                                "role that will be mentioned when there are free games to claim")
-# async def react_role(ctx: discord.ApplicationContext):
+# async def react_role(ctx: discord.ApplicationContext) -> None:
 #     pass
 
 
 @bot.event
-async def on_ready():
+async def on_ready() -> None:
     print(f"{functions.get_current_date_time()} Logged in as {bot.user}")
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="for free games"))
     main_loop.start()
 
 
 @bot.event
-async def on_application_command_error(ctx: discord.ApplicationContext, error: discord.DiscordException):
+async def on_application_command_error(ctx: discord.ApplicationContext, error: discord.DiscordException) -> None:
     if isinstance(error, commands.CommandOnCooldown):
         await ctx.respond(f"❌ This command is currently on cooldown. Please try again in {round(error.retry_after)}s.",
                           ephemeral=True)
