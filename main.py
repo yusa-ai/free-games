@@ -110,6 +110,7 @@ async def stores(ctx: discord.ApplicationContext) -> None:
     await ctx.respond("Select which stores to get free games from", view=view, ephemeral=True)
 
 
+@commands.has_permissions(administrator=True)
 @bot.slash_command(description="Select which role to ping when there is a free game to claim",
                    guild_ids=[1067218515343450264])
 async def role(ctx: discord.ApplicationContext) -> None:
