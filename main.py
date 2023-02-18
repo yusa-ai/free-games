@@ -113,8 +113,7 @@ async def stores(ctx: discord.ApplicationContext) -> None:
 
 
 @commands.has_permissions(administrator=True)
-@bot.slash_command(description="Select which role to ping when there is a free game to claim",
-                   guild_ids=[1067218515343450264])
+@bot.slash_command(description="Select which role to ping when there is a free game to claim")
 async def role(ctx: discord.ApplicationContext) -> None:
     view = discord.ui.View(SelectRole(ctx))
     await ctx.respond("Select which role to mention when there is a free game to claim", view=view, ephemeral=True)
